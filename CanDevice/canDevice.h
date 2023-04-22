@@ -12,7 +12,7 @@ class CanDevice{
     public:
         CanDevice();
         State getState();
-    private:
+    protected:
         u16p canWrite;
         u16p canRead;
 };
@@ -21,11 +21,10 @@ class Motor : public CanDevice{
     public:
         Motor();
         void setParams(M_PARAM params);
-        u16 update(MOTOR_CONTROL_TETRA control);
+        void update(MOTOR_CONTROL_TETRA control);
     private:
-        u16 maxSpeed;
-        u16 maxAcc;
-        u16 maxTorque;
+        i16 maxSpeed;
+        i16 maxTorque;
 };
 
 class Resolver : public CanDevice {

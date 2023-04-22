@@ -7,17 +7,20 @@ class Joint{
     public:
         Joint();
         void setParams(J_PARAM params);
-        MOTOR_CONTROL_TETRA update(MOTOR_CONTROL_TETRA control);
+        JOINT_STATE update(JOINT_CONTROL_TRIPLET control);
         float* getQuotaPointer();
+        void setHomedState(bool _homed);
+        bool getHomedState();
     private:
-        u16 maxStroke;
-        u16 minStroke;
-        u16 maxSpeed;
-        u16 maxAcc;
-        u16 maxTorque;
+        float maxStroke;
+        float minStroke;
+        float maxSpeed;
+        float maxAcc;
+        float maxTorque;
         bool homed;
-        u16 homeQuota;
+        float homeQuota;
         float quota;
+        JOINT_STATE state;
 };
 
 #endif

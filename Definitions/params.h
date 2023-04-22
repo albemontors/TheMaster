@@ -1,6 +1,7 @@
 #ifndef _DEFINES_H
 #define _DEFINES_H
 
+#include <stdint.h>
 #define AXIS_COUNT 5
 
 
@@ -13,20 +14,19 @@ typedef struct {
 DH_PARAM;
 
 typedef struct {
-    float J1_MAX_STROKE;
-    float J1_MIN_STROKE;
-    float J1_MAX_SPEED;
-    float J1_MAX_ACC;
-    float J1_MAX_TORQUE;
-    float J1_HOME_QUOTA; } 
+    float MAX_STROKE;
+    float MIN_STROKE;
+    float MAX_SPEED;
+    float MAX_ACC;
+    float MAX_TORQUE;
+    float HOME_QUOTA; } 
 J_PARAM;
 
 typedef struct {
-    float M1_MAX_SPEED;
-    float M1_MAX_ACC;
-    float M1_MAX_TORQUE;
-    int* CAN_WRITE;
-    int* CAN_READ; }
+    float MAX_SPEED;
+    float MAX_TORQUE;
+    uint16_t* CAN_WRITE;
+    uint16_t* CAN_READ; }
 M_PARAM;
 
 

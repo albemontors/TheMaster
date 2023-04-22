@@ -12,7 +12,6 @@ void Motor::setParams(M_PARAM params){
 }
 
 void Motor::update(MOTOR_CONTROL_TETRA control){
-
     if(control.controlVel > maxSpeed) return; //TODO stuff
 
     if(control.torqueFF > maxTorque) return; //TODO stuff

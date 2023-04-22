@@ -7,6 +7,8 @@
 
 typedef uint16_t u16;
 typedef uint16_t* u16p;
+typedef int16_t i16;
+typedef int16_t* i16p;
 
 typedef struct { 
     u16 x;
@@ -47,11 +49,42 @@ typedef struct {
 POSE;
 
 typedef struct {
-    u16 controlSpeed;
+    u16 controlPos;
     u16 controlVel;
     u16 torqueFF;
     u16 integratorLimit; }
 MOTOR_CONTROL_TETRA;
+
+typedef struct {
+    u16 currentPos;
+    u16 currentVel;
+    u16 currentTorque;
+    u16 motorAxisState; }
+MOTOR_STATE_TETRA;
+
+typedef struct {
+    u16 currentPos;
+    u16 currentVel;
+    u16 currentTorque; }
+JOINT_STATE_TRIPLET;
+
+typedef struct {
+    u16 controlPos;
+    u16 controlVel;
+    u16 torqueFF; }
+JOINT_CONTROL_TRIPLET;
+
+typedef struct {
+    u16 reserved : 1;
+    u16 isPowered : 1;
+    u16 powerAllowed : 1;
+    u16 isHomed : 1;
+    u16 error : 1;
+    u16 maxStrokeHit : 1;
+    u16 minStrokeHit : 1;
+}
+JOINT_STATE;
+
 
 
 #endif

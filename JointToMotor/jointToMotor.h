@@ -8,6 +8,7 @@ class JointToMotor{
     public:
         JointToMotor();
         
+        
     private:
         float proportionalQuotas[AXIS_COUNT][AXIS_COUNT];
 

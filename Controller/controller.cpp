@@ -1,4 +1,5 @@
 #include "controller.h"
+#include <cmath>
 
 ArmController::ArmController(){
 
@@ -31,9 +32,73 @@ ArmController::ArmController(){
 }
 
 ControlMode ArmController::update(){
-    ControlMode result;
 
+    if(requestedMode != NO_MODE) modeUpdate();
 
+    switch(controlMode) {
+
+        case NO_MODE:
+            requestedMode = NO_POW;
+            break;
+
+        case NO_POW:
+            // TODO: implement nopow state
+            break;
+
+        case IDLE:
+            // update position of the real arm
+            rC = realArm.update();
+
+            // evaluate tracking error
+            trackingError = evaluateTrackingError(iC.q, rC.q);
+
+            // update ideal position based on real position
+            iC = rC;
+
+            // execute inverce kinematics and update the ideal arm
+            idealArm.update(iC);
+
+            break;
+        
+        case POWER:
+            // update position of the real arm
+            rC = realArm.update();
+
+            // evaluate tracking error
+            trackingError = evaluateTrackingError(iC.q, rC.q);
+
+            // hold ideal position, no update for this variables
+            
+            // check tracking error for values that exceed the max allowed
+            if (isGreater3Df(trackingError, maxAllowedTrackingError)) { 
+                forcedMode = IDLE;
+                
+
+            // execute inverce kinematics and update the ideal arm
+            idealArm.update(iC);
+
+            break;
+    }
+
+    if(forcedMode != NO_MODE) modeUpdate();
     
-    return result;
+    return controlMode;
+}
+
+void ArmController::modeUpdate() {
+    ControlMode newControlMode;
+    ControlMode reqMode;
+
+    if(forcedMode){
+        reqMode = forcedMode;
+    } else if (requestedMode){
+        reqMode = requestedMode;
+    }
+
+    // TODO set parameters for each mode
+    controlMode = reqMode;
+
+    requestedMode = NO_MODE;
+    forcedMode = NO_MODE;
+    controlMode = newControlMode;
 }

@@ -16,15 +16,21 @@ class Arm{
 };
 
 enum ControlMode {
+    NO_MODE,
     NO_POW,
     IDLE,
+    POWER_BEFORE_HOMED,
+    POWER,
+    MANUAL_BEFORE_HOMED,
+    MANUAL,
+    AUTOMATIC,
 };
 
 class IdealArm : public Arm {
     public:
         IdealArm();
         void setJointArray(Joint* jointArray);
-        ControlMode update(VECTOR3Df controls);
+        ControlMode update(ARM_CARTESIAN_VARIABLES controls);
         u16 setMovementMode(ControlMode mode);
         u16 getMovementMode(ControlMode mode);
     private:
@@ -40,7 +46,7 @@ class RealArm : public Arm {
         RealArm();
         void setTransducerArray(Resolver* rArray);
         void setHDArray(Mat4* dhArray);
-        VECTOR3Df update();
+        ARM_CARTESIAN_VARIABLES update();
     private:
         Mat4* H;    //arm homogeneous transformations link-1 to link
         Resolver* T;

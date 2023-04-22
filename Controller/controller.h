@@ -7,6 +7,7 @@ class ArmController{
     public:
         ArmController();
         ControlMode update();
+        void requestMode();
     private:
         Joint J[AXIS_COUNT];
         Motor M[AXIS_COUNT];
@@ -16,15 +17,18 @@ class ArmController{
         RealArm realArm;
         IdealArm idealArm;
         float k;
-        VECTOR3Df qCr;
-        VECTOR3Df vCr;
-        VECTOR3Df qCi;
-        VECTOR3Df vCi;
+        ARM_CARTESIAN_VARIABLES iC;
+        ARM_CARTESIAN_VARIABLES rC;
         VECTOR3Df trackingError;
+        VECTOR3Df maxAllowedTrackingError;
         DH_PARAM DH_param[AXIS_COUNT];
         J_PARAM J_param[AXIS_COUNT];
         M_PARAM M_param[AXIS_COUNT];
         ControlMode controlMode;
+        ControlMode requestedMode;
+        ControlMode forcedMode;
+
+        void modeUpdate();
 };
 
 #endif

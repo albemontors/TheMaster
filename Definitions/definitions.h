@@ -8,6 +8,12 @@
 typedef uint16_t u16;
 typedef uint16_t* u16p;
 
+typedef struct {
+    u16 TRACKING_ERROR : 1;
+    u16 RESERVED : 7;
+    u16 AXIS_ERROR : 8; }
+CONTROLLER_ERROR;
+
 typedef struct { 
     u16 x;
     u16 y;
@@ -39,6 +45,12 @@ typedef struct {
 VECTOR6Df;
 
 typedef struct {
+    VECTOR3Df q;
+    VECTOR3Df V;
+    VECTOR3Df t; }
+ARM_CARTESIAN_VARIABLES;
+
+typedef struct {
     u16 J1;
     u16 J2;
     u16 J3;
@@ -53,5 +65,10 @@ typedef struct {
     u16 integratorLimit; }
 MOTOR_CONTROL_TETRA;
 
+VECTOR3Df add3DF(VECTOR3Df a, VECTOR3Df b);
+VECTOR3Df invert3DF(VECTOR3Df a);
+VECTOR6Df add6DF(VECTOR6Df a, VECTOR6Df b);
+VECTOR3Df evaluateTrackingError(VECTOR3Df iC, VECTOR3Df rC);
+bool isGreater3Df(VECTOR3Df var, VECTOR3Df param);
 
 #endif

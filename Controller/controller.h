@@ -8,6 +8,10 @@ class ArmController{
         ArmController();
         ControlMode update();
         void requestMode();
+        void requestPower();
+        void requestIdle();
+        void requestManual(bool manual);
+        void requestAutomatic(bool automatic);
     private:
         Joint J[AXIS_COUNT];
         Motor M[AXIS_COUNT];
@@ -27,8 +31,10 @@ class ArmController{
         ControlMode controlMode;
         ControlMode requestedMode;
         ControlMode forcedMode;
-
         void modeUpdate();
+        CONTROLLER_ERROR error;
+        bool noError();
+        void setHome();
 };
 
 #endif

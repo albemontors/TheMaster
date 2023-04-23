@@ -14,7 +14,7 @@ ControlMode IdealArm::update(ARM_CARTESIAN_VARIABLES controls) { //$TODO
     return controlMode;
 }
 
-ControlMode IdealArm::setMovementMode(ControlMode mode){ // set the control mode param, returns the new control mode (checks to be added later) //$TODO?
+ControlMode IdealArm::setMovementMode(ControlMode mode){ // set the control mode param, returns the new control mode (checks to be added later) //$TODO
     controlMode = mode;
 
     return controlMode; 

@@ -1,5 +1,6 @@
 #include "controller.h"
 #include <cmath>
+#include <cstdint>
 
 ArmController::ArmController(){
 
@@ -38,7 +39,7 @@ ControlMode ArmController::update(){
     switch(controlMode) {
 
         case NO_MODE:
-            requestedMode = NO_POW;
+            forcedMode = NO_POW;
             break;
 
         case NO_POW:
@@ -72,13 +73,16 @@ ControlMode ArmController::update(){
             // check tracking error for values that exceed the max allowed
             if (isGreater3Df(trackingError, maxAllowedTrackingError)) { 
                 forcedMode = IDLE;
-                
-
+                error.TRACKING_ERROR = 1;
+            }
             // execute inverce kinematics and update the ideal arm
             idealArm.update(iC);
 
             break;
     }
+
+    
+    if(!noError()) forcedMode = NO_POW;
 
     if(forcedMode != NO_MODE) modeUpdate();
     
@@ -95,10 +99,50 @@ void ArmController::modeUpdate() {
         reqMode = requestedMode;
     }
 
-    // TODO set parameters for each mode
-    controlMode = reqMode;
+    switch(controlMode){
+        case NO_MODE:
+            newControlMode = NO_POW;
+            break;
+
+        case NO_POW:
+            break;
+
+        case IDLE:
+            switch(reqMode){
+                case NO_POW: newControlMode = NO_POW; break;
+                case IDLE: if(noError()) newControlMode = IDLE; break;
+                default: newControlMode = IDLE;
+            }
+            break;
+
+        case POWER_BEFORE_HOMED:
+            switch(reqMode){
+                case NO_POW: newControlMode = NO_POW; break;
+                case IDLE: if(noError()) newControlMode = IDLE; break;
+                case POWER: if(noError()) setHome(); newControlMode = POWER; break;
+            }
+            break;
+        
+        case POWER:
+            switch(reqMode){
+                case NO_POW: newControlMode = NO_POW; break;
+                case IDLE: if(noError()) newControlMode = IDLE; break;
+            }
+            break;
+
+        default:
+            reqMode = NO_MODE;
+    }
 
     requestedMode = NO_MODE;
     forcedMode = NO_MODE;
     controlMode = newControlMode;
+}
+
+bool ArmController::noError() {
+    if (
+        error.TRACKING_ERROR == 0 &&
+        error.AXIS_ERROR == 0
+    ) return true;
+    return false;
 }

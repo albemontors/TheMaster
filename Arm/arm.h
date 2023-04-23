@@ -15,7 +15,7 @@ enum ControlMode {
 
 class Arm{
     public:
-        Arm(); // init function, leave it empity
+        Arm();
         //u16 setTool(Mat4 tool);
         //Mat4 getTool();
     protected:
@@ -26,13 +26,13 @@ class Arm{
 
 class IdealArm : public Arm {
     public:
-        IdealArm(); // init function, leave it empity
-        void setJointArray(Joint* jointArray); // gets the joint pointer and assigns it
-        ControlMode update(ARM_CARTESIAN_VARIABLES controls); // i do this shit, leave it empity
-        ControlMode setMovementMode(ControlMode mode); // set the control mode param, returns the new control mode (checks to be added later)
-        ControlMode getMovementMode(); // get the control mode param
+        IdealArm();
+        void setJointArray(Joint* jointArray);
+        ControlMode update(ARM_CARTESIAN_VARIABLES controls);
+        ControlMode setMovementMode(ControlMode mode);
+        ControlMode getMovementMode();
     private:
-        Joint* J;   //arm joints pointers
+        Joint* J;
         JointToMotor jointToMotor;
         float qJ[AXIS_COUNT];
         u16 qM[AXIS_COUNT];
@@ -41,12 +41,12 @@ class IdealArm : public Arm {
 
 class RealArm : public Arm {
     public:
-        RealArm(); // init function, leave it empity
-        void setTransducerArray(Resolver* rArray); // sets the T variable with the pointer
-        void setHDArray(Mat4* dhArray); // sets the H variable with the pointer
-        ARM_CARTESIAN_VARIABLES update(); // i do this shit, leave it empity
+        RealArm();
+        void setHDArray(Mat4* dhArray);
+        void setTransducerArray(Resolver* rArray);
+        ARM_CARTESIAN_VARIABLES update();
     private:
-        Mat4* H;    //arm homogeneous transformations link-1 to link
+        Mat4* H;
         Resolver* T;
 };
 

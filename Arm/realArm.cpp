@@ -12,7 +12,7 @@ void RealArm::setTransducerArray(Resolver *tArray){
     T = tArray;
 }
 
-ARM_CARTESIAN_VARIABLES RealArm::update() {
+ARM_CARTESIAN_VARIABLES RealArm::update() { //$TODO
     ARM_CARTESIAN_VARIABLES control;
 
     return control;

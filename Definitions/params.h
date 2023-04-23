@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #define AXIS_COUNT 5
+#define KBRATIO (1000/6.28)
 
 typedef struct {
     float tetha; 

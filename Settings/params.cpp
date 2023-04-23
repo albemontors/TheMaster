@@ -75,9 +75,6 @@ void initJtMParam(float** mat) {
 
     };
 
-    float kbRatio = 1000/6.28;
-
-    for(int i = 0; i < AXIS_COUNT; i++) for(int j = 0; j < AXIS_COUNT; j++) init[i][j] *= kbRatio;
-
     for(int i = 0; i < AXIS_COUNT; i++) for(int j = 0; j < AXIS_COUNT; j++) mat[i][j] = init[i][j];
 }
+

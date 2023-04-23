@@ -7,7 +7,7 @@ class Joint{
     public:
         Joint();
         void setParams(J_PARAM params);
-        JOINT_STATE update(JOINT_CONTROL_TRIPLET control);
+        JOINT_STATE update(JOINT_CONTROL_TETRA control);
         float* getQuotaPointer();
         void setHomedState(bool _homed);
         bool getHomedState();

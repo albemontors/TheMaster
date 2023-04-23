@@ -13,7 +13,7 @@ void Joint::setParams(J_PARAM params) {
     homeQuota = params.HOME_QUOTA;
 }
 
-JOINT_STATE Joint::update(JOINT_CONTROL_TRIPLET control) {
+JOINT_STATE Joint::update(JOINT_CONTROL_TETRA control) {
     if(abs(control.controlPos) > maxStroke); //TODO stuff
 
     if(abs(control.controlPos) < minStroke); //TODO stuff

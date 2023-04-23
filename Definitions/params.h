@@ -2,9 +2,8 @@
 #define _DEFINES_H
 
 #include <stdint.h>
+
 #define AXIS_COUNT 5
-
-
 
 typedef struct {
     float tetha; 
@@ -23,8 +22,8 @@ typedef struct {
 J_PARAM;
 
 typedef struct {
-    float MAX_SPEED;
-    float MAX_TORQUE;
+    uint16_t MAX_SPEED;
+    uint16_t MAX_TORQUE;
     uint16_t* CAN_WRITE;
     uint16_t* CAN_READ; }
 M_PARAM;
@@ -33,6 +32,7 @@ M_PARAM;
 
 //INIT FUNCTION
 void initGlobalParam(DH_PARAM* DH_param, J_PARAM* J_param, M_PARAM* M_param);
+void initJtMParam(float** mat);
 
 
 #endif

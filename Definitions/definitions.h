@@ -3,7 +3,6 @@
 
 #include "mbed.h"
 #include "params.h"
-#include <cstdint>
 
 typedef uint16_t u16;
 typedef uint16_t* u16p;
@@ -76,16 +75,17 @@ typedef struct {
 MOTOR_STATE_TETRA;
 
 typedef struct {
-    u16 currentPos;
-    u16 currentVel;
-    u16 currentTorque; }
+    float currentPos;
+    float currentVel;
+    float currentTorque; }
 JOINT_STATE_TRIPLET;
 
 typedef struct {
-    u16 controlPos;
-    u16 controlVel;
-    u16 torqueFF; }
-JOINT_CONTROL_TRIPLET;
+    float controlPos;
+    float controlVel;
+    float torqueFF;
+    float integratorLimit; }
+JOINT_CONTROL_TETRA;
 
 typedef struct {
     u16 reserved : 1;

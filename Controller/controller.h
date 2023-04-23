@@ -3,10 +3,21 @@
 
 #include "arm.h"
 
+enum OpeMode {
+    NO_MODE,
+    NO_POW,
+    IDLE,
+    POWER_BEFORE_HOMED,
+    POWER,
+    MANUAL_BEFORE_HOMED,
+    MANUAL,
+    AUTOMATIC,
+};
+
 class ArmController{
     public:
-        ArmController();
-        ControlMode update();
+        ArmController(u16p _MOTOR_DATA, u16p _MOTOR_SETTINGS, u16p _RESOLVER_DATA);
+        OpeMode update();
         void requestMode();
         void requestPower();
         void requestIdle();
@@ -28,9 +39,12 @@ class ArmController{
         DH_PARAM DH_param[AXIS_COUNT];
         J_PARAM J_param[AXIS_COUNT];
         M_PARAM M_param[AXIS_COUNT];
-        ControlMode controlMode;
-        ControlMode requestedMode;
-        ControlMode forcedMode;
+        u16p MOTOR_DATA;
+        u16p MOTOR_SETTINGS;
+        u16p RESOLVER_DATA;
+        OpeMode opeMode;
+        OpeMode requestedMode;
+        OpeMode forcedMode;
         void modeUpdate();
         CONTROLLER_ERROR error;
         bool noError();

@@ -2,7 +2,11 @@
 #include <cmath>
 #include <cstdint>
 
-ArmController::ArmController(){
+ArmController::ArmController(u16p _MOTOR_DATA, u16p _MOTOR_SETTINGS, u16p _RESOLVER_DATA){
+
+    MOTOR_DATA = _MOTOR_DATA;
+    MOTOR_SETTINGS = _MOTOR_SETTINGS;
+    RESOLVER_DATA = _RESOLVER_DATA;
 
     // A TON OF GLOBAL VARIABLES
     DH_PARAM DH_param[AXIS_COUNT];
@@ -10,6 +14,12 @@ ArmController::ArmController(){
     M_PARAM M_param[AXIS_COUNT];
     //INIT ALL PARAMETERS
     initGlobalParam(DH_param, J_param, M_param);
+
+    // init can links
+    for(int i = 0; i < AXIS_COUNT; i++){
+        M_param[i].CAN_READ = RESOLVER_DATA + (i * 4 * sizeof(uint16_t));
+        M_param[i].CAN_WRITE = MOTOR_DATA + (i * 4 * sizeof(uint16_t));
+    }
 
     // init joints
     for(int i = 0; i < AXIS_COUNT; i++)
@@ -30,13 +40,15 @@ ArmController::ArmController(){
     realArm.setTransducerArray(R);
     realArm.setHDArray(DH);
     idealArm.setJointArray(J);
+
+    jointToMotor.init();
 }
 
-ControlMode ArmController::update(){
+OpeMode ArmController::update(){
 
     if(requestedMode != NO_MODE) modeUpdate();
 
-    switch(controlMode) {
+    switch(opeMode) {
 
         case NO_MODE:
             forcedMode = NO_POW;
@@ -86,12 +98,12 @@ ControlMode ArmController::update(){
 
     if(forcedMode != NO_MODE) modeUpdate();
     
-    return controlMode;
+    return opeMode;
 }
 
 void ArmController::modeUpdate() {
-    ControlMode newControlMode;
-    ControlMode reqMode;
+    OpeMode newopeMode;
+    OpeMode reqMode;
 
     if(forcedMode){
         reqMode = forcedMode;
@@ -99,9 +111,9 @@ void ArmController::modeUpdate() {
         reqMode = requestedMode;
     }
 
-    switch(controlMode){
+    switch(opeMode){
         case NO_MODE:
-            newControlMode = NO_POW;
+            newopeMode = NO_POW;
             break;
 
         case NO_POW:
@@ -109,24 +121,24 @@ void ArmController::modeUpdate() {
 
         case IDLE:
             switch(reqMode){
-                case NO_POW: newControlMode = NO_POW; break;
-                case IDLE: if(noError()) newControlMode = IDLE; break;
-                default: newControlMode = IDLE;
+                case NO_POW: newopeMode = NO_POW; break;
+                case IDLE: if(noError()) newopeMode = IDLE; break;
+                default: newopeMode = IDLE;
             }
             break;
 
         case POWER_BEFORE_HOMED:
             switch(reqMode){
-                case NO_POW: newControlMode = NO_POW; break;
-                case IDLE: if(noError()) newControlMode = IDLE; break;
-                case POWER: if(noError()) setHome(); newControlMode = POWER; break;
+                case NO_POW: newopeMode = NO_POW; break;
+                case IDLE: if(noError()) newopeMode = IDLE; break;
+                case POWER: if(noError()) /*setHome();*/ newopeMode = POWER; break;
             }
             break;
         
         case POWER:
             switch(reqMode){
-                case NO_POW: newControlMode = NO_POW; break;
-                case IDLE: if(noError()) newControlMode = IDLE; break;
+                case NO_POW: newopeMode = NO_POW; break;
+                case IDLE: if(noError()) newopeMode = IDLE; break;
             }
             break;
 
@@ -136,7 +148,7 @@ void ArmController::modeUpdate() {
 
     requestedMode = NO_MODE;
     forcedMode = NO_MODE;
-    controlMode = newControlMode;
+    opeMode = newopeMode;
 }
 
 bool ArmController::noError() {
@@ -145,4 +157,8 @@ bool ArmController::noError() {
         error.AXIS_ERROR == 0
     ) return true;
     return false;
+}
+
+void ArmController::setHome() {
+    // $TODO
 }

@@ -3,36 +3,34 @@
 
 #include "mat.h"
 #include "jointToMotor.h"
+#include "joint.h"
+#include "canDevice.h"
+
+enum ControlMode {
+    NO_CONTROL_MODE,
+    JOINT,
+    CARTESIAN,
+    TOOL,
+};
 
 class Arm{
     public:
-        Arm();
-        u16 setTool(Mat4 tool);
-        Mat4 getTool();
+        Arm(); // init function, leave it empity
+        //u16 setTool(Mat4 tool);
+        //Mat4 getTool();
     protected:
         POSE controls;
     private:
         
 };
 
-enum ControlMode {
-    NO_MODE,
-    NO_POW,
-    IDLE,
-    POWER_BEFORE_HOMED,
-    POWER,
-    MANUAL_BEFORE_HOMED,
-    MANUAL,
-    AUTOMATIC,
-};
-
 class IdealArm : public Arm {
     public:
-        IdealArm();
-        void setJointArray(Joint* jointArray);
-        ControlMode update(ARM_CARTESIAN_VARIABLES controls);
-        u16 setMovementMode(ControlMode mode);
-        u16 getMovementMode(ControlMode mode);
+        IdealArm(); // init function, leave it empity
+        void setJointArray(Joint* jointArray); // gets the joint pointer and assigns it
+        ControlMode update(ARM_CARTESIAN_VARIABLES controls); // i do this shit, leave it empity
+        ControlMode setMovementMode(ControlMode mode); // set the control mode param, returns the new control mode (checks to be added later)
+        ControlMode getMovementMode(); // get the control mode param
     private:
         Joint* J;   //arm joints pointers
         JointToMotor jointToMotor;
@@ -43,13 +41,15 @@ class IdealArm : public Arm {
 
 class RealArm : public Arm {
     public:
-        RealArm();
-        void setTransducerArray(Resolver* rArray);
-        void setHDArray(Mat4* dhArray);
-        ARM_CARTESIAN_VARIABLES update();
+        RealArm(); // init function, leave it empity
+        void setTransducerArray(Resolver* rArray); // sets the T variable with the pointer
+        void setHDArray(Mat4* dhArray); // sets the H variable with the pointer
+        ARM_CARTESIAN_VARIABLES update(); // i do this shit, leave it empity
     private:
         Mat4* H;    //arm homogeneous transformations link-1 to link
         Resolver* T;
 };
+
+
 
 #endif

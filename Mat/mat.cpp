@@ -5,14 +5,12 @@
 ====================================*/
 
 Mat4::Mat4(){
-    this->externalTheta = false;
     //init matrix to zeros
     for(int i = 0; i < 4; i++) for(int j = 0; j < 4; j++) this->a[i][j] = 0.0f;
     
 }
 
-Mat4::Mat4(float** R, float* X){
-    this->externalTheta = false;
+Mat4::Mat4(float R[3][3], float* X){
     //init matrix to zeros
     for(int i = 0; i < 3; i++) for(int j = 0; j < 3; j++) this->a[i][j] = R[i][j];
     for(int i = 0; i < 3; i++) this->a[3][i] = X[i];
@@ -20,32 +18,42 @@ Mat4::Mat4(float** R, float* X){
     this->a[3][3] = 1.0f;
 }
 
-Mat4::Mat4(float* theta, float alpha, float a, float d){
-    this->externalTheta = true;
+Mat4::Mat4(float alpha, float a, float d){
     this->alphaad[0] = alpha;
     this->alphaad[1] = a;
     this->alphaad[2] = d;
-    this->update();
+    this->update(0.0f);
 }
 
-Mat4 Mat4::update(){
-    if(not externalTheta) return *this;
+Mat4 Mat4::setParam(float alpha, float a, float d){
+    this->alphaad[0] = alpha;
+    this->alphaad[1] = a;
+    this->alphaad[2] = d;
+    this->update(0.0f);
+    return *this;
+}
+
+Mat4 Mat4::update(float _theta){
     Mat4 TrZ;
     Mat4 RtZ;
     Mat4 RtX;
     Mat4 TrX;
-    TrZ.generateRotZ(*(this->theta));
-    TrZ.generateTrnZ(this->alphaad[0]);
+    RtZ.generateRotZ(_theta);
+    TrZ.generateTrnZ(this->alphaad[2]);
     TrX.generateTrnX(this->alphaad[1]);
-    RtX.generateRotX(this->alphaad[2]);
-    Mat4 c = Mat4();
-    c.write(TrZ.multiply(RtZ).multiply(RtX).multiply(TrX));
-    this->write(c);
+    RtX.generateRotX(this->alphaad[0]);
+    this->multiply4DH(TrZ, RtZ, RtX, TrX);
     return *this;
 }
 
 Mat4 Mat4::write(Mat4 b){
     for(int i = 0; i < 4; i++) for(int j = 0; j < 4; j++) this->a[i][j] = b.readCell(i, j);
+    return *this;
+}
+
+Mat4 Mat4::writeAll(Mat4 b){
+    for(int i = 0; i < 4; i++) for(int j = 0; j < 4; j++) this->a[i][j] = b.readCell(i, j);
+    for(int i = 0; i < 3; i++) this->alphaad[i] = b.alphaad[i];
     return *this;
 }
 
@@ -55,7 +63,7 @@ Mat4 Mat4::multiply(Mat4 b){
     for(int i = 0; i < 4; i++)
         for(int j = 0; j < 4; j++){
             s = 0.0f;
-            for(int l = 0; l < 4; l++) s += this->a[i][l] * b.readCell(l, j);
+            for(int l = 0; l < 4; l++) s += this->a[l][j] * b.readCell(i, l);
             c.writeCell(i, j, s);
         }
     this->write(c);
@@ -72,13 +80,13 @@ Mat4 Mat4::generateIdentity(){
 
 Mat4 Mat4::generateTrnX(float val){
     this->generateIdentity();
-    this->writeCell(0, 4, val);
+    this->writeCell(0, 3, val);
     return *this;
 }
 
 Mat4 Mat4::generateTrnZ(float val){
     this->generateIdentity();
-    this->writeCell(3, 4, val);
+    this->writeCell(2, 3, val);
     return *this;
 }
 
@@ -101,10 +109,8 @@ Mat4 Mat4::generateRotZ(float theta){
 }
 
 Mat4 Mat4::multiply4DH(Mat4 TrZ, Mat4 RtZ, Mat4 RtX, Mat4 TrX){
-    Mat4 c = Mat4();
-    c.write(TrZ.multiply(RtZ).multiply(RtX).multiply(TrX));
-    this->write(c);
-    return c;
+    this->write(RtX.multiply(TrX).multiply(TrZ).multiply(RtZ));
+    return *this;
 }
 
 float Mat4::readCell(uint8_t row, uint8_t column){
@@ -124,11 +130,5 @@ Mat4 Mat4::verbose(){
         printf(" \n ");
         }
     printf(" \n ==== END OF PRINT === \n ");
-    return *this;
-}
-
-Mat4 Mat4::assignTheta(float* thetap){
-    theta = thetap;
-    externalTheta = 1;
     return *this;
 }

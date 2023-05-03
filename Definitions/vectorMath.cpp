@@ -28,9 +28,20 @@ VECTOR3Df invert3DF(VECTOR3Df a) {
     return c;
 }
 
-VECTOR3Df evaluateTrackingError(VECTOR3Df iC, VECTOR3Df rC) {
-    VECTOR3Df c;
-    c = add3DF(iC, invert3DF(rC));
+VECTOR6Df invert6DF(VECTOR6Df a) {
+    VECTOR6Df c;
+    c.x = -a.x;
+    c.y = -a.y;
+    c.z = -a.z;
+    c.a = -a.a;
+    c.b = -a.b;
+    c.c = -a.c;
+    return c;
+}
+
+VECTOR6Df evaluateTrackingError(VECTOR6Df iC, VECTOR6Df rC) {
+    VECTOR6Df c;
+    c = add6DF(iC, invert6DF(rC));
     return c;
 }
 

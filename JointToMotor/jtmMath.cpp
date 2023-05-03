@@ -108,10 +108,9 @@ void transponseMatrix(float** M) {
     for(int i = 0; i < AXIS_COUNT; i++) for(int j = 0; j < AXIS_COUNT; j++) M[i][j] = A[i][j];
 }
 
-void vecXmat(float* V, float** M) {
+void vecXmat(float* V, float M[AXIS_COUNT][AXIS_COUNT]) {
     float B[AXIS_COUNT];
     for(int i = 0; i < AXIS_COUNT; i++) B[i] = 0;
-
     for(int i = 0; i < AXIS_COUNT; i++)
         for(int j = 0; j < AXIS_COUNT; j++)
             B[i] += V[j] * M[i][j];

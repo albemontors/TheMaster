@@ -18,7 +18,7 @@ class Mat4 {
         * @param X[3] vector for x,y,z
         * @return this
         */
-        Mat4(float** R, float* X);
+        Mat4(float R[3][3], float* X);
         /**
         * @brief Constructor, makes a 4x4 matrix starting from a square array
         * @param theta to be a pointer to the value of theta
@@ -27,23 +27,32 @@ class Mat4 {
         * @param d hartenbergs value d
         * @return this
         */
-        Mat4(float* theta, float alpha, float a, float d);
+        Mat4(float alpha, float a, float d);
+        /**
+        * @brief Constructor, makes a 4x4 matrix starting from a square array
+        * @param theta to be a pointer to the value of theta
+        * @param alpha hartenbergs value alpha
+        * @param a hartenbergs value a
+        * @param d hartenbergs value d
+        * @return this
+        */
+        Mat4 setParam(float alpha, float a, float d);
         /**
         * @brief updates the theta value for matrices defined from pointed value
         * @return this
         */
-        Mat4 update();
+        Mat4 update(float _theta);
         /**
         * @brief changes the pointed value for Theta
         * @return this
         */
-        Mat4 assignTheta(float*);
+        Mat4 write(Mat4 b);    
         /**
-        * @brief writes the input into this
+        * @brief writes the input and parameters into this
         * @param matrix to write into this
         * @return this
         */
-        Mat4 write(Mat4 b);    
+        Mat4 writeAll(Mat4 b); 
         /**
         * @brief row by column multiplication between this and param
         * @param b second member of multiplication
@@ -108,12 +117,10 @@ class Mat4 {
         * @return this
         */
         Mat4 verbose();
-
+        float alphaad[3];
     private:
         float a[4][4];
-        bool externalTheta;
-        float* theta;
-        float alphaad[3];
+        
 };
 
 #endif

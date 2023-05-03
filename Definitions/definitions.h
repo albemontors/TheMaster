@@ -106,6 +106,7 @@ JOINT_STATE;
 
 VECTOR3Df add3DF(VECTOR3Df a, VECTOR3Df b);
 VECTOR3Df invert3DF(VECTOR3Df a);
+VECTOR6Df evaluateTrackingError(VECTOR6Df iC, VECTOR6Df rC);
 VECTOR6Df add6DF(VECTOR6Df a, VECTOR6Df b);
 VECTOR6Df evaluateTrackingError(VECTOR6Df iC, VECTOR6Df rC);
 bool isGreater3Df(VECTOR3Df var, VECTOR3Df param);

@@ -15,19 +15,19 @@ enum ControlMode {
 
 class Arm{
     public:
-        Arm();
+        Arm(JointToMotor* jointToMotor);
         //u16 setTool(Mat4 tool);
         //Mat4 getTool();
     protected:
         POSE controls;
-        JointToMotor jointToMotor;
+        JointToMotor *jointToMotor;
     private:
         
 };
 
 class IdealArm : public Arm {
     public:
-        IdealArm();
+        IdealArm(JointToMotor* jointToMotor);
         void setJointArray(Joint* jointArray);
         void setMotorArray(Motor* motorArray);
         ControlMode update(POSE controls);
@@ -43,10 +43,11 @@ class IdealArm : public Arm {
 
 class RealArm : public Arm {
     public:
-        RealArm();
+        RealArm(JointToMotor* jointToMotor);
         void setDHArray(Mat4* dhArray);
         void setTransducerArray(Resolver* rArray);
-        POSE update();
+        POSE update();   
+        POSE getPose();
     private:
         ARM_CARTESIAN_VARIABLES forwardKin(ARM_JOINTS_VARIABLES pose);
         Mat4* H;

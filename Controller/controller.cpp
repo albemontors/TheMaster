@@ -2,7 +2,10 @@
 #include <cmath>
 #include <cstdint>
 
-ArmController::ArmController(u16p _MOTOR_DATA, u16p _MOTOR_SETTINGS, u16p _RESOLVER_DATA){
+ArmController::ArmController(u16p _MOTOR_DATA, u16p _MOTOR_SETTINGS, u16p _RESOLVER_DATA) : 
+    realArm(&jointToMotor) , idealArm(&jointToMotor){
+
+    wait_us(1000);
 
     MOTOR_DATA = _MOTOR_DATA;
     MOTOR_SETTINGS = _MOTOR_SETTINGS;
@@ -17,8 +20,8 @@ ArmController::ArmController(u16p _MOTOR_DATA, u16p _MOTOR_SETTINGS, u16p _RESOL
 
     // init can links
     for(int i = 0; i < AXIS_COUNT; i++){
-        M_param[i].CAN_READ = RESOLVER_DATA + (i * 4 * sizeof(uint16_t));
-        M_param[i].CAN_WRITE = MOTOR_DATA + (i * 4 * sizeof(uint16_t));
+        M_param[i].CAN_READ = RESOLVER_DATA + (i * 8/2);
+        M_param[i].CAN_WRITE = MOTOR_DATA + (i * 8/2);
     }
 
     // init joints
@@ -34,14 +37,17 @@ ArmController::ArmController(u16p _MOTOR_DATA, u16p _MOTOR_SETTINGS, u16p _RESOL
         R[i].setParams(M_param[i]);
 
     // init denavit hartemberg matrices
-    for(int i = 0; i < AXIS_COUNT; i++)
-        DH[i] = Mat4(&r.joint.q[i] , DH_param[i].alpha, DH_param[i].a, DH_param[i].d);
+    for(int i = 0; i < AXIS_COUNT; i++){
+        DH[i].setParam(DH_param[i].alpha, DH_param[i].a, DH_param[i].d);
+        printf("init values for axis %d are: %f %f %f \n", i, DH_param[i].alpha, DH_param[i].a, DH_param[i].d);
+        printf("values in DH %d are        : %f %f %f \n", i, DH[i].alphaad[0], DH[i].alphaad[1], DH[i].alphaad[2]);
+        DH[i].verbose(); }
 
     realArm.setTransducerArray(R);
     realArm.setDHArray(DH);
     idealArm.setJointArray(J);
 
-    jointToMotor.init();
+    jointToMotor.init(J_param);
 }
 
 OpeMode ArmController::update(){
@@ -52,7 +58,7 @@ OpeMode ArmController::update(){
 
         case DEBUG:
             r = realArm.update();
-            printf("J1 = %5.3f, J2 = %5.3f, X = %5.3f, Y = %5.3f, Z = %5.3f \n",
+            printf("J1 = %+5.3f, J2 = %+5.3f, X = %+6.1f, Y = %+6.1f, Z = %+6.1f \n",
                 r.joint.q[0],
                 r.joint.q[1],
                 r.cart.q.x,
@@ -175,7 +181,7 @@ bool ArmController::noError() {
 }
 
 void ArmController::setHome() {
-    // $TODO
+    jointToMotor.setHome();
 }
 
 void ArmController::setControlMode(ControlMode controlMode) {

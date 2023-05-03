@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define AXIS_COUNT 2
-#define KBRATIO (1000/6.28)
+#define KBRATIO (1000.0f/6.28)
 
 typedef struct {
     float alpha; 
@@ -32,7 +32,7 @@ M_PARAM;
 
 //INIT FUNCTION
 void initGlobalParam(DH_PARAM* DH_param, J_PARAM* J_param, M_PARAM* M_param);
-void initJtMParam(float** mat);
+void initJtMParam(float** M);
 
 
 #endif

@@ -23,8 +23,8 @@ JOINTS_STATE;
 class JointToMotor{
     public:
         JointToMotor();
-        void init();
-        bool setHome(JOINTS_STATE input);
+        void init(J_PARAM* jParam);
+        bool setHome();
         MOTORS_COMMAND jtm(JOINTS_CONTROL input);
         JOINTS_STATE mtj(MOTORS_STATE input);
     private:
@@ -32,6 +32,8 @@ class JointToMotor{
         float proportionalQuotasInverted[AXIS_COUNT][AXIS_COUNT];
         float homingVectorJtM[AXIS_COUNT];
         float homingVectorMtJ[AXIS_COUNT];
+        float homingVectorShifts[AXIS_COUNT];
+        float rawJq[AXIS_COUNT];
 };
 
 bool invert(float** M);
@@ -41,7 +43,7 @@ void transponseMatrix(float** M);
 /**
  * @note overwrites V
  */
-void vecXmat(float* V, float** M);
+void vecXmat(float* V, float M[AXIS_COUNT][AXIS_COUNT]);
 /**
  * @note overwrites A
  */

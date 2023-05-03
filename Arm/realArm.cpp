@@ -1,12 +1,11 @@
 #include "arm.h"
 
-RealArm::RealArm(){
+RealArm::RealArm(JointToMotor* jointToMotor) : Arm(jointToMotor){
 
 }
 
 void RealArm::setDHArray(Mat4* dhArray){
     H = dhArray;
-    for(int i = 0; i < AXIS_COUNT; i++) H[i].assignTheta(&(controls.joint.q[i]));
 }
 
 void RealArm::setTransducerArray(Resolver *tArray){
@@ -14,20 +13,19 @@ void RealArm::setTransducerArray(Resolver *tArray){
 }
 
 POSE RealArm::update() { //$TODO
-    POSE control;
 
     // collect and validate encoder data
     MOTORS_STATE motors;
     for(int i = 0; i < AXIS_COUNT; i++) motors.state[i] = R[i].update();
 
     // shift to joint space
-    JOINTS_STATE joints = jointToMotor.mtj(motors);
+    JOINTS_STATE joints = jointToMotor->mtj(motors);
 
     // write joints parameters
     for(int i = 0; i < AXIS_COUNT; i++) {
-        control.joint.q[i] = joints.command[i].currentPos;
-        control.joint.v[i] = joints.command[i].currentVel;
-        control.joint.t[i] = joints.command[i].currentTorque; }
+        controls.joint.q[i] = joints.command[i].currentPos;
+        controls.joint.v[i] = joints.command[i].currentVel;
+        controls.joint.t[i] = joints.command[i].currentTorque; }
 
     // compute the forward kinematics
     controls.cart = forwardKin(controls.joint);
@@ -36,23 +34,31 @@ POSE RealArm::update() { //$TODO
 
     // $todo implement tool coordinates transformation
 
-    return control;
+    return controls;
 }
 
 ARM_CARTESIAN_VARIABLES RealArm::forwardKin(ARM_JOINTS_VARIABLES pose){
     ARM_CARTESIAN_VARIABLES output;
 
     // update all DH matrices with the new theta values
-    for(int i = 0; i < AXIS_COUNT; i++) H[i].update();
+    for(int i = 0; i < AXIS_COUNT; i++) H[i].update(pose.q[i]);
 
     // compute the multiplication through
     Mat4 cart;
-    cart.write(H[0]);
+    cart.write(H[1]);
+    cart.multiply(H[0]);
 
-    for(int i = 1; i < AXIS_COUNT; i++) cart.multiply(H[i]);
+    Mat4 shift;
+    shift.generateTrnZ(618);
+    cart.multiply(shift);
 
-    
-
+    output.q.x = cart.readCell(0, 3);
+    output.q.y = cart.readCell(1, 3);
+    output.q.z = cart.readCell(2, 3);
 
     return output;
+}
+
+POSE RealArm::getPose() {
+    return controls;
 }

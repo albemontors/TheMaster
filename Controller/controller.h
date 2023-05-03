@@ -2,6 +2,7 @@
 #define _CONTROLLER_H
 
 #include "arm.h"
+#include <cstdint>
 
 enum OpeMode {
     DEBUG = -2,
@@ -25,6 +26,7 @@ class ArmController{
         void requestManual(bool manual);
         void setControlMode(ControlMode controlMode);
         void requestAutomatic(bool automatic);
+        void setHome();
     private:
         Joint J[AXIS_COUNT];
         Motor M[AXIS_COUNT];
@@ -43,7 +45,7 @@ class ArmController{
         M_PARAM M_param[AXIS_COUNT];
         u16p MOTOR_DATA;
         u16p MOTOR_SETTINGS;
-        u16p RESOLVER_DATA;
+        uint16_t* RESOLVER_DATA;
         ControlMode controlMode;
         OpeMode opeMode;
         OpeMode requestedMode;
@@ -51,7 +53,6 @@ class ArmController{
         void modeUpdate();
         CONTROLLER_ERROR error;
         bool noError();
-        void setHome();
 };
 
 #endif

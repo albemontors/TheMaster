@@ -1,6 +1,6 @@
 #include "arm.h"
 
-IdealArm::IdealArm(){
+IdealArm::IdealArm(JointToMotor* jointToMotor) : Arm(jointToMotor){
     
 }
 
@@ -31,7 +31,7 @@ ControlMode IdealArm::update(POSE controls) { //$TODO
                 return controlMode; }
 
             // execute joint to motor conversion
-            MOTORS_COMMAND motorCommand = jointToMotor.jtm(jointControls);
+            MOTORS_COMMAND motorCommand = jointToMotor->jtm(jointControls);
 
             // validate motor command and update can objects
             for(int i = 0; i < AXIS_COUNT; i++) M[i].update(motorCommand.state[i]);
@@ -54,3 +54,8 @@ ControlMode IdealArm::getMovementMode(){
     return controlMode;
 };
 
+ARM_JOINTS_VARIABLES IdealArm::inverseKin(ARM_CARTESIAN_VARIABLES pose) {
+    ARM_JOINTS_VARIABLES output;
+
+    return output;
+}

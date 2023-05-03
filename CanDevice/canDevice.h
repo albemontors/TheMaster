@@ -33,7 +33,7 @@ class Resolver : public CanDevice {
     public:
         Resolver();
         void setParams(M_PARAM params);
-        MOTOR_CONTROL_TETRA update();
+        MOTOR_STATE_TETRA update();
         float* getQuotaPointer();
     private:
         float quota;

@@ -35,10 +35,10 @@ ArmController::ArmController(u16p _MOTOR_DATA, u16p _MOTOR_SETTINGS, u16p _RESOL
 
     // init denavit hartemberg matrices
     for(int i = 0; i < AXIS_COUNT; i++)
-        DH[i] = Mat4(R[i].getQuotaPointer() , DH_param[i].alpha, DH_param[i].a, DH_param[i].d);
+        DH[i] = Mat4(&r.joint.q[i] , DH_param[i].alpha, DH_param[i].a, DH_param[i].d);
 
     realArm.setTransducerArray(R);
-    realArm.setHDArray(DH);
+    realArm.setDHArray(DH);
     idealArm.setJointArray(J);
 
     jointToMotor.init();
@@ -50,6 +50,16 @@ OpeMode ArmController::update(){
 
     switch(opeMode) {
 
+        case DEBUG:
+            r = realArm.update();
+            printf("J1 = %5.3f, J2 = %5.3f, X = %5.3f, Y = %5.3f, Z = %5.3f \n",
+                r.joint.q[0],
+                r.joint.q[1],
+                r.cart.q.x,
+                r.cart.q.y,
+                r.cart.q.z);
+            break;
+
         case NO_MODE:
             forcedMode = NO_POW;
             break;
@@ -60,35 +70,35 @@ OpeMode ArmController::update(){
 
         case IDLE:
             // update position of the real arm
-            rC = realArm.update();
+            r = realArm.update();
 
             // evaluate tracking error
-            trackingError = evaluateTrackingError(iC.q, rC.q);
+            trackingError = evaluateTrackingError(i.cart.q, r.cart.q);
 
             // update ideal position based on real position
-            iC = rC;
+            i = r;
 
             // execute inverce kinematics and update the ideal arm
-            idealArm.update(iC);
+            idealArm.update(i);
 
             break;
         
         case POWER:
             // update position of the real arm
-            rC = realArm.update();
+            r = realArm.update();
 
             // evaluate tracking error
-            trackingError = evaluateTrackingError(iC.q, rC.q);
+            trackingError = evaluateTrackingError(i.cart.q, r.cart.q);
 
             // hold ideal position, no update for this variables
             
             // check tracking error for values that exceed the max allowed
-            if (isGreater3Df(trackingError, maxAllowedTrackingError)) { 
+            if (isGreater6Df(trackingError, maxAllowedTrackingError)) { 
                 forcedMode = IDLE;
                 error.TRACKING_ERROR = 1;
             }
             // execute inverce kinematics and update the ideal arm
-            idealArm.update(iC);
+            idealArm.update(i);
 
             break;
     }
@@ -102,7 +112,7 @@ OpeMode ArmController::update(){
 }
 
 void ArmController::modeUpdate() {
-    OpeMode newopeMode;
+    OpeMode newOpeMode;
     OpeMode reqMode;
 
     if(forcedMode){
@@ -111,44 +121,49 @@ void ArmController::modeUpdate() {
         reqMode = requestedMode;
     }
 
-    switch(opeMode){
-        case NO_MODE:
-            newopeMode = NO_POW;
-            break;
+    if(reqMode != DEBUG)
+        switch(opeMode){
 
-        case NO_POW:
-            break;
+            case NO_MODE:
+                newOpeMode = NO_POW;
+                break;
 
-        case IDLE:
-            switch(reqMode){
-                case NO_POW: newopeMode = NO_POW; break;
-                case IDLE: if(noError()) newopeMode = IDLE; break;
-                default: newopeMode = IDLE;
-            }
-            break;
+            case NO_POW:
+                break;
 
-        case POWER_BEFORE_HOMED:
-            switch(reqMode){
-                case NO_POW: newopeMode = NO_POW; break;
-                case IDLE: if(noError()) newopeMode = IDLE; break;
-                case POWER: if(noError()) /*setHome();*/ newopeMode = POWER; break;
-            }
-            break;
-        
-        case POWER:
-            switch(reqMode){
-                case NO_POW: newopeMode = NO_POW; break;
-                case IDLE: if(noError()) newopeMode = IDLE; break;
-            }
-            break;
+            case IDLE:
+                switch(reqMode){
+                    case NO_POW: newOpeMode = NO_POW; break;
+                    case IDLE: if(noError()) newOpeMode = IDLE; break;
+                    default: newOpeMode = IDLE;
+                }
+                break;
 
-        default:
-            reqMode = NO_MODE;
+            case POWER_BEFORE_HOMED:
+                switch(reqMode){
+                    case NO_POW: newOpeMode = NO_POW; break;
+                    case IDLE: if(noError()) newOpeMode = IDLE; break;
+                    case POWER: if(noError()) /*setHome();*/ newOpeMode = POWER; break;
+                }
+                break;
+            
+            case POWER:
+                switch(reqMode){
+                    case NO_POW: newOpeMode = NO_POW; break;
+                    case IDLE: if(noError()) newOpeMode = IDLE; break;
+                }
+                break;
+
+            default:
+                reqMode = NO_MODE;
+        }
+    else {
+        newOpeMode = DEBUG;
     }
 
     requestedMode = NO_MODE;
     forcedMode = NO_MODE;
-    opeMode = newopeMode;
+    opeMode = newOpeMode;
 }
 
 bool ArmController::noError() {
@@ -161,4 +176,12 @@ bool ArmController::noError() {
 
 void ArmController::setHome() {
     // $TODO
+}
+
+void ArmController::setControlMode(ControlMode controlMode) {
+    idealArm.setMovementMode(controlMode);
+}
+
+void ArmController::requestMode(OpeMode mode) {
+    requestedMode = mode;
 }

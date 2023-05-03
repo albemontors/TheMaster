@@ -11,6 +11,7 @@ class Joint{
         float* getQuotaPointer();
         void setHomedState(bool _homed);
         bool getHomedState();
+        bool isError();
     private:
         float maxStroke;
         float minStroke;

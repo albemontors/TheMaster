@@ -126,3 +126,9 @@ Mat4 Mat4::verbose(){
     printf(" \n ==== END OF PRINT === \n ");
     return *this;
 }
+
+Mat4 Mat4::assignTheta(float* thetap){
+    theta = thetap;
+    externalTheta = 1;
+    return *this;
+}

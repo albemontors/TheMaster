@@ -3,11 +3,10 @@
 
 #include <stdint.h>
 
-#define AXIS_COUNT 5
+#define AXIS_COUNT 2
 #define KBRATIO (1000/6.28)
 
 typedef struct {
-    float tetha; 
     float alpha; 
     float a; 
     float d; }

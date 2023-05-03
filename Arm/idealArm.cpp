@@ -8,8 +8,37 @@ void IdealArm::setJointArray(Joint* jointArray){
     J = jointArray;
 }
 
-ControlMode IdealArm::update(ARM_CARTESIAN_VARIABLES controls) { //$TODO
-    ControlMode controlMode;
+void IdealArm::setMotorArray(Motor* motorArray){
+    M = motorArray;
+}
+
+ControlMode IdealArm::update(POSE controls) { //$TODO
+
+    switch(controlMode){
+        case TOOL:
+            // $TODO implement tool to cartesian transformation
+
+        case CARTESIAN:
+            controls.joint = inverseKin(controls.cart);
+
+        case JOINT:
+            // validate joints positions
+            JOINTS_CONTROL jointControls;
+            jointsControlTranslator(&controls.joint, jointControls.command);
+            for(int i = 0; i < AXIS_COUNT; i++) J[i].update(jointControls.command[i]);
+            for(int i = 0; i < AXIS_COUNT; i++) if(J[i].isError()) { 
+                controlMode = NO_CONTROL_MODE; 
+                return controlMode; }
+
+            // execute joint to motor conversion
+            MOTORS_COMMAND motorCommand = jointToMotor.jtm(jointControls);
+
+            // validate motor command and update can objects
+            for(int i = 0; i < AXIS_COUNT; i++) M[i].update(motorCommand.state[i]);
+
+            break;
+
+    }
 
     return controlMode;
 }
@@ -24,3 +53,4 @@ ControlMode IdealArm::getMovementMode(){
 
     return controlMode;
 };
+

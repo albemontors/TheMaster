@@ -40,3 +40,13 @@ bool isGreater3Df(VECTOR3Df var, VECTOR3Df param) {
     if(var.z > param.z) return true;
     return false;
 }
+
+bool isGreater6Df(VECTOR6Df var, VECTOR6Df param) {
+    if(var.x > param.x) return true;
+    if(var.y > param.y) return true;
+    if(var.z > param.z) return true;
+    if(var.a > param.a) return true;
+    if(var.b > param.b) return true;
+    if(var.c > param.c) return true;
+    return false;
+}

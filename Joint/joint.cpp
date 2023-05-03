@@ -37,3 +37,5 @@ bool Joint::getHomedState() {
     return homed;
 }
 
+bool Joint::isError() { return state.error; }
+

@@ -20,6 +20,7 @@ class Arm{
         //Mat4 getTool();
     protected:
         POSE controls;
+        JointToMotor jointToMotor;
     private:
         
 };
@@ -28,13 +29,14 @@ class IdealArm : public Arm {
     public:
         IdealArm();
         void setJointArray(Joint* jointArray);
-        ControlMode update(ARM_CARTESIAN_VARIABLES controls);
+        void setMotorArray(Motor* motorArray);
+        ControlMode update(POSE controls);
         ControlMode setMovementMode(ControlMode mode);
         ControlMode getMovementMode();
     private:
+        ARM_JOINTS_VARIABLES inverseKin(ARM_CARTESIAN_VARIABLES pose);
         Joint* J;
-        JointToMotor jointToMotor;
-        float qJ[AXIS_COUNT];
+        Motor* M;
         u16 qM[AXIS_COUNT];
         ControlMode controlMode;
 };
@@ -42,14 +44,16 @@ class IdealArm : public Arm {
 class RealArm : public Arm {
     public:
         RealArm();
-        void setHDArray(Mat4* dhArray);
+        void setDHArray(Mat4* dhArray);
         void setTransducerArray(Resolver* rArray);
-        ARM_CARTESIAN_VARIABLES update();
+        POSE update();
     private:
+        ARM_CARTESIAN_VARIABLES forwardKin(ARM_JOINTS_VARIABLES pose);
         Mat4* H;
-        Resolver* T;
+        Resolver* R;
 };
 
+void jointsControlTranslator(ARM_JOINTS_VARIABLES* armJoints, JOINT_CONTROL_TETRA* jointsControls);
 
 
 #endif

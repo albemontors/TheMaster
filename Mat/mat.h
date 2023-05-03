@@ -37,7 +37,7 @@ class Mat4 {
         * @brief changes the pointed value for Theta
         * @return this
         */
-        Mat4 assignTheta(float**);
+        Mat4 assignTheta(float*);
         /**
         * @brief writes the input into this
         * @param matrix to write into this

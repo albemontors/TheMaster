@@ -46,18 +46,23 @@ typedef struct {
 VECTOR6Df;
 
 typedef struct {
-    VECTOR3Df q;
-    VECTOR3Df V;
-    VECTOR3Df t; }
+    VECTOR6Df q;
+    VECTOR6Df V;
+    VECTOR6Df t; }
 ARM_CARTESIAN_VARIABLES;
 
 typedef struct {
-    u16 J1;
-    u16 J2;
-    u16 J3;
-    u16 J4;
-    u16 J5; } 
-POSE;
+    float q[AXIS_COUNT];
+    float v[AXIS_COUNT];
+    float t[AXIS_COUNT];
+    float l[AXIS_COUNT]; }
+ARM_JOINTS_VARIABLES;
+
+
+typedef struct {
+    ARM_CARTESIAN_VARIABLES cart;
+    ARM_JOINTS_VARIABLES joint; } 
+POSE; // $TODO add tool coordinates to the set
 
 typedef struct {
     u16 controlPos;
@@ -65,7 +70,6 @@ typedef struct {
     u16 torqueFF;
     u16 integratorLimit; }
 MOTOR_CONTROL_TETRA;
-
 
 typedef struct {
     u16 currentPos;
@@ -75,17 +79,17 @@ typedef struct {
 MOTOR_STATE_TETRA;
 
 typedef struct {
-    float currentPos;
-    float currentVel;
-    float currentTorque; }
-JOINT_STATE_TRIPLET;
-
-typedef struct {
     float controlPos;
     float controlVel;
     float torqueFF;
     float integratorLimit; }
 JOINT_CONTROL_TETRA;
+
+typedef struct {
+    float currentPos;
+    float currentVel;
+    float currentTorque; }
+JOINT_STATE_TRIPLET;
 
 typedef struct {
     u16 reserved : 1;
@@ -103,8 +107,8 @@ JOINT_STATE;
 VECTOR3Df add3DF(VECTOR3Df a, VECTOR3Df b);
 VECTOR3Df invert3DF(VECTOR3Df a);
 VECTOR6Df add6DF(VECTOR6Df a, VECTOR6Df b);
-VECTOR3Df evaluateTrackingError(VECTOR3Df iC, VECTOR3Df rC);
+VECTOR6Df evaluateTrackingError(VECTOR6Df iC, VECTOR6Df rC);
 bool isGreater3Df(VECTOR3Df var, VECTOR3Df param);
-
+bool isGreater6Df(VECTOR6Df var, VECTOR6Df param);
 
 #endif

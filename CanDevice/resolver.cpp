@@ -11,17 +11,21 @@ void Resolver::setParams(M_PARAM params){
     canRead = params.CAN_READ;
 }
 
-MOTOR_CONTROL_TETRA Resolver::update() {
-    MOTOR_CONTROL_TETRA control;
+MOTOR_STATE_TETRA Resolver::update() {
+    MOTOR_STATE_TETRA control;
 
-    control.controlPos = canRead[0];
-    control.controlVel = canRead[1];
-    control.torqueFF = canRead[2];
+    bool overSpeed = 0;
+
+    control.currentPos = canRead[0];
+    control.currentVel = canRead[1];
+    control.currentTorque = canRead[2];
     state = (State)canRead[3];
 
-    if(control.controlVel > maxSpeed); //TODO stuff
+    if(control.currentVel > maxSpeed) overSpeed = 1;
 
-    if(control.torqueFF > maxTorque); //TODO stuff
+    if(control.currentVel > maxTorque) overSpeed = 1;
+
+    if(overSpeed) control.motorAxisState |= 0x10; // rise fifth bit for overspeed issue
 
     return control;
 }

@@ -8,6 +8,7 @@ void Resolver::setParams(M_PARAM params){
     maxSpeed = params.MAX_SPEED;
     maxTorque = params.MAX_TORQUE;
     canWrite = 0;
+    canWrite2 = 0;
     canRead = params.CAN_READ;
 }
 

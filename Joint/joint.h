@@ -7,12 +7,15 @@ class Joint{
     public:
         Joint();
         void setParams(J_PARAM params);
-        JOINT_STATE update(JOINT_CONTROL_TETRA control);
+        JOINT_CONTROL_TETRA update(JOINT_CONTROL_TETRA* control);
         float* getQuotaPointer();
-        void setHomedState(bool _homed);
+        void setHomedState(float position);
+        void forcePosition(float position);
         bool getHomedState();
         bool isError();
     private:
+        float currentPosition;
+        float currentVelocity;
         float maxStroke;
         float minStroke;
         float maxSpeed;

@@ -15,6 +15,11 @@ typedef struct {
     u16 AXIS_ERROR : 8; }
 CONTROLLER_ERROR;
 
+struct vector2D{
+    float x;
+    float y;
+};
+
 typedef struct { 
     u16 x;
     u16 y;
@@ -72,6 +77,13 @@ typedef struct {
 MOTOR_CONTROL_TETRA;
 
 typedef struct {
+    u16 requestedMode;
+    u16 inputMode;
+    u16 controlMode;
+    u16 currentLimit; }
+MOTOR_SETTINGS_TETRA;
+
+typedef struct {
     u16 currentPos;
     u16 currentVel;
     u16 currentTorque;
@@ -111,5 +123,6 @@ VECTOR6Df add6DF(VECTOR6Df a, VECTOR6Df b);
 VECTOR6Df evaluateTrackingError(VECTOR6Df iC, VECTOR6Df rC);
 bool isGreater3Df(VECTOR3Df var, VECTOR3Df param);
 bool isGreater6Df(VECTOR6Df var, VECTOR6Df param);
+void clamp(float* var, float max, float min, float input);
 
 #endif

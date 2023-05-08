@@ -2,6 +2,8 @@
 #define _CANDEVICE_H
 
 #include "definitions.h"
+#include <cstdint>
+#include <stdint.h>
 
 enum State {
     MOTOR_IDLE = 1,
@@ -15,6 +17,7 @@ class CanDevice{
     protected:
         State state;
         u16p canWrite;
+        u16p canWrite2;
         u16p canRead;        
         i16 maxSpeed;
         i16 maxTorque;        
@@ -25,6 +28,7 @@ class Motor : public CanDevice{
         Motor();
         void setParams(M_PARAM params);
         void update(MOTOR_CONTROL_TETRA control);
+        void updateParams(MOTOR_SETTINGS_TETRA settings);
     private:
 
 };

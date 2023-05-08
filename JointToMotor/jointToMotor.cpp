@@ -9,19 +9,19 @@ void JointToMotor::init(J_PARAM* jParam) {
     //initJtMParam((float**)proportionalQuotas);
     float mat[5][5] = {
         //         M1  M2  M3  M4  M5
-        /*J1*/      -9,  0,  0,  0,  0,
+        /*J1*/     -9,  0,  0,  0,  0,
         /*J2*/      0,  9,  0,  0,  0,
         /*J3*/      0,  0,  9,  9,  0,
         /*J4*/      0,  0, -9,  9,  0,
         /*J5*/      0,  0,  0,  0,  1, };
     for(int i = 0; i < AXIS_COUNT; i++) for(int j = 0; j < AXIS_COUNT; j++) proportionalQuotas[i][j] = mat[i][j];
     float mat2[5][5] = {
-        //         M1  M2  M3  M4  M5
-        /*J1*/      -1.0f/9,  0,  0,  0,  0,
-        /*J2*/      0,  1.0f/9,  0,  0,  0,
-        /*J3*/      0,  0,  1.0f/18,  1.0f/18,  0,
-        /*J4*/      0,  0, -1.0f/18,  1.0f/18,  0,
-        /*J5*/      0,  0,  0,  0,  1, };
+        //          M1        M2        M3        M4  M5
+        /*J1*/ -1.0f/9,        0,        0,        0,  0,
+        /*J2*/       0,  1.0f/9,         0,        0,  0,
+        /*J3*/       0,        0,  1.0f/18, -1.0f/18,  0,
+        /*J4*/       0,        0,  1.0f/18,  1.0f/18,  0,
+        /*J5*/       0,        0,        0,        0,  1, };
     for(int i = 0; i < AXIS_COUNT; i++) for(int j = 0; j < AXIS_COUNT; j++) proportionalQuotasInverted[i][j] = mat2[i][j];
     //invert((float**)proportionalQuotasInverted);
     for(int i = 0; i < AXIS_COUNT; i++) homingVectorMtJ[i] = 0;
@@ -59,8 +59,7 @@ MOTORS_COMMAND JointToMotor::jtm(JOINTS_CONTROL input) {
     //---------- INTEGRATOR LIMIT ----------------
     float L[AXIS_COUNT];
     for(int i = 0; i < AXIS_COUNT; i++) L[i] = input.command[i].integratorLimit;
-    vecXmat((float*)L, proportionalQuotasInverted);
-    vecXfloat((float*)L, 1000);
+    vecXfloat((float*)L, 1000.0f/9.0f);
     for(int i = 0; i < AXIS_COUNT; i++) output.state[i].integratorLimit = abs(L[i]);
     //-------------------------------------------
     return output; 

@@ -1,16 +1,5 @@
 #include "params.h"
 
-#define MAXMOTORSPEED 1000 // 1 rps
-#define MAXMOTORTORQUE 1000 // 1 Nm
-#define MAXJSPEED 1.0f // 1 rad/s
-#define MAXJTORQUE 1.0f // 1 Nm
-#define PI 3.141593
-#define L1x -13
-#define L1z -218
-#define L2 400
-#define L3 400
-#define L4 100 // $TODO setup L4
-
 void initGlobalParam(DH_PARAM* DH_param, J_PARAM* J_param, M_PARAM* M_param){
 
     DH_param[0] = {
@@ -22,7 +11,7 @@ void initGlobalParam(DH_PARAM* DH_param, J_PARAM* J_param, M_PARAM* M_param){
         .MAX_STROKE = PI/2,
         .MIN_STROKE = -PI/2,
         .MAX_SPEED = MAXJSPEED,
-        .MAX_ACC = 0,
+        .MAX_ACC = MAXACC,
         .MAX_TORQUE = MAXJTORQUE,
         .HOME_QUOTA = 0
     };
@@ -32,7 +21,7 @@ void initGlobalParam(DH_PARAM* DH_param, J_PARAM* J_param, M_PARAM* M_param){
         .CAN_WRITE = 0,
         .CAN_READ = 0
     };
-//#if AXIS_COUNT >= 2
+#if AXIS_COUNT >= 2
     DH_param[1] = {
         .alpha = 0, 
         .a = -L2, 
@@ -42,7 +31,7 @@ void initGlobalParam(DH_PARAM* DH_param, J_PARAM* J_param, M_PARAM* M_param){
         .MAX_STROKE = 5*(PI/6),
         .MIN_STROKE = PI/6,
         .MAX_SPEED = MAXJSPEED,
-        .MAX_ACC = 0,
+        .MAX_ACC = MAXACC,
         .MAX_TORQUE = MAXJTORQUE,
         .HOME_QUOTA = PI/2
     };
@@ -52,7 +41,7 @@ void initGlobalParam(DH_PARAM* DH_param, J_PARAM* J_param, M_PARAM* M_param){
         .CAN_WRITE = 0,
         .CAN_READ = 0
     };
-//#endif
+#endif
 #if AXIS_COUNT >= 3
     DH_param[2] = {
         .alpha = -PI/2, 
@@ -60,10 +49,10 @@ void initGlobalParam(DH_PARAM* DH_param, J_PARAM* J_param, M_PARAM* M_param){
         .d = 0 
     };
     J_param[2] = {
-        .MAX_STROKE = 0,
+        .MAX_STROKE = PI/8,
         .MIN_STROKE = -PI, // $TODO refine endstrokes
         .MAX_SPEED = MAXJSPEED,
-        .MAX_ACC = 0,
+        .MAX_ACC = MAXACC,
         .MAX_TORQUE = MAXJTORQUE,
         .HOME_QUOTA = -PI/2
     };
@@ -84,7 +73,7 @@ void initGlobalParam(DH_PARAM* DH_param, J_PARAM* J_param, M_PARAM* M_param){
         .MAX_STROKE = PI,
         .MIN_STROKE = -PI,
         .MAX_SPEED = MAXJSPEED,
-        .MAX_ACC = 0,
+        .MAX_ACC = MAXACC,
         .MAX_TORQUE = MAXJTORQUE,
         .HOME_QUOTA = 0
     };

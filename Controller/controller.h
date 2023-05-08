@@ -4,6 +4,8 @@
 #include "arm.h"
 #include <cstdint>
 
+#define CURRENT_LIMIT 60
+
 enum OpeMode {
     DEBUG = -2,
     NO_MODE,
@@ -16,17 +18,27 @@ enum OpeMode {
     AUTOMATIC,
 };
 
+typedef struct {
+    float LX;
+    float LY;
+    float RX;
+    float RY; }
+INPUT;
+
 class ArmController{
     public:
-        ArmController(u16p _MOTOR_DATA, u16p _MOTOR_SETTINGS, u16p _RESOLVER_DATA);
-        OpeMode update();
+        ArmController(u16* _MOTOR_DATA, u16* _MOTOR_SETTINGS, u16* _RESOLVER_DATA);
+        OpeMode update(INPUT input);
         void requestMode(OpeMode mode);
-        void requestPower();
-        void requestIdle();
+        OpeMode getMode();
+        void setInput(VECTOR6Df input);
         void requestManual(bool manual);
         void setControlMode(ControlMode controlMode);
+        void setManJogSpeed(float _manJogSpeed);
         void requestAutomatic(bool automatic);
         void setHome();
+        POSE getIdealPose();
+        POSE getRealPose();
     private:
         Joint J[AXIS_COUNT];
         Motor M[AXIS_COUNT];
@@ -36,23 +48,27 @@ class ArmController{
         RealArm realArm;
         IdealArm idealArm;
         float k;
-        POSE i;
-        POSE r;
+        float manJogSpeed;
         VECTOR6Df trackingError;
         VECTOR6Df maxAllowedTrackingError;
+        VECTOR6Df input;
         DH_PARAM DH_param[AXIS_COUNT];
         J_PARAM J_param[AXIS_COUNT];
         M_PARAM M_param[AXIS_COUNT];
-        u16p MOTOR_DATA;
-        u16p MOTOR_SETTINGS;
+        u16* MOTOR_DATA;
+        u16* MOTOR_SETTINGS;
         uint16_t* RESOLVER_DATA;
-        ControlMode controlMode;
         OpeMode opeMode;
         OpeMode requestedMode;
         OpeMode forcedMode;
         void modeUpdate();
         CONTROLLER_ERROR error;
         bool noError();
+        void sendMotorControlWords(OpeMode mode);
+        ARM_CARTESIAN_VARIABLES cartLimit[2];
+        bool inCartSpace(ARM_CARTESIAN_VARIABLES input);
 };
+
+void sendSettingsPdos();
 
 #endif

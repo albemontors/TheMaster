@@ -61,3 +61,9 @@ bool isGreater6Df(VECTOR6Df var, VECTOR6Df param) {
     if(var.c > param.c) return true;
     return false;
 }
+
+void clamp(float* var, float max, float min, float input) {
+    *var += input;
+    if(*var > max) *var = max;
+    if(*var < min) *var = min;
+}

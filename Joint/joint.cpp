@@ -1,7 +1,7 @@
 #include "joint.h"
 
 Joint::Joint() {
-
+    currentVelocity = 0.0f;
 }
 
 void Joint::setParams(J_PARAM params) {
@@ -13,24 +13,76 @@ void Joint::setParams(J_PARAM params) {
     homeQuota = params.HOME_QUOTA;
 }
 
-JOINT_STATE Joint::update(JOINT_CONTROL_TETRA control) {
-    if(abs(control.controlPos) > maxStroke); //TODO stuff
+JOINT_CONTROL_TETRA Joint::update(JOINT_CONTROL_TETRA* control) {
 
-    if(abs(control.controlPos) < minStroke); //TODO stuff
+    float timingFactor = 1.0f/maxAcc;
 
-    if(abs(control.controlVel) > maxSpeed); //TODO stuff
+    // verify endstrokes
+    if(homed) {
+        if(control->controlPos > maxStroke) control->controlPos = maxStroke;
+        if(control->controlPos < minStroke) control->controlPos = minStroke; }
 
-    if(abs(control.torqueFF) > maxTorque); //TODO stuff
+    //save current position
+    float posInput = control->controlPos;
+    // evaluate position error
+    float posError = posInput - currentPosition;
+    // evaluate velocity error
+    float velError = posError - currentVelocity;
+    // calculate deceleration
+    if(abs(posError) < 10.0f){
+        if(currentVelocity > 0.0f) if((currentPosition + (currentVelocity * timingFactor)) > posInput) velError = -maxAcc;
+        if(currentVelocity < 0.0f) if((currentPosition + (currentVelocity * timingFactor)) < posInput) velError =  maxAcc; }
 
-    return state;
+    // slow down upon reaching endsrokes
+    float maxSpeedPos =  maxSpeed;
+    float maxSpeedNeg = -maxSpeed;
+    if(homed) {
+        if((currentPosition + (currentVelocity * timingFactor)) > maxStroke) velError = -maxAcc;
+        if((currentPosition + (currentVelocity * timingFactor)) < minStroke) velError =  maxAcc; 
+        if(maxSpeedPos >  maxSpeed) maxSpeedPos =  maxSpeed;
+        if(maxSpeedPos <      0.0f) maxSpeedPos =  0.0f;
+        if(maxSpeedNeg < -maxSpeed) maxSpeedNeg = -maxSpeed;
+        if(maxSpeedNeg >      0.0f) maxSpeedNeg =  0.0f; }
+
+    // limit max acceleration
+    if(velError >  maxAcc) velError =  maxAcc;
+    if(velError < -maxAcc) velError = -maxAcc;
+    //update velocity command
+    currentVelocity += (velError * (CONTROL_PERIOD/1000.0f));
+    // limit max speed
+    if(currentVelocity > maxSpeedPos) currentVelocity = maxSpeedPos;
+    if(currentVelocity < maxSpeedNeg) currentVelocity = maxSpeedNeg;
+    
+    // update position command
+    currentPosition += (currentVelocity * (CONTROL_PERIOD/1000.0f));
+    // check endstrokes again
+    if(homed) {
+        if(currentPosition > maxStroke) { currentPosition = maxStroke; if(currentVelocity > 0.0f) currentVelocity = 0.0f; }
+        if(currentPosition < minStroke) { currentPosition = minStroke; if(currentVelocity < 0.0f) currentVelocity = 0.0f; } }
+    
+    // present output
+    JOINT_CONTROL_TETRA output;
+    output.controlPos = currentPosition;
+    output.controlVel = currentVelocity;
+    output.torqueFF = control->torqueFF;
+    output.integratorLimit = control->integratorLimit;
+
+    return output;
 }
 
 float* Joint::getQuotaPointer() {
     return &quota;
 }
 
-void Joint::setHomedState(bool _homed) {
-    homed = _homed;
+void Joint::setHomedState(float position) {
+    currentPosition = position;
+    currentVelocity = 0.0f;
+    homed = true;
+}
+
+void Joint::forcePosition(float position) {
+    currentPosition = position;
+    currentVelocity = 0.0f;
 }
 
 bool Joint::getHomedState() {
